@@ -21,9 +21,17 @@
             </v-tab-item>
 
             <v-tab-item class="resume-tab-item">
-                <v-card flat>
-                    <v-card-text>PDF</v-card-text>
-                </v-card>
+                <object width="100%" height="90%" type="application/pdf" data="/nicolas-capparelli-resume.pdf">
+                    <div style="height: 100%; width: 90%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: auto;">
+                        <p style="font-size: 20px; text-align: center;">PDF Preview is not supported on mobile, press the button to download</p>
+                        <v-btn 
+                            v-on:click="downloadPDF()"
+                            style="margin-bottom: 1rem; background-color: #424242;"
+                        >
+                            Donwload PDF
+                        </v-btn>
+                    </div>
+                </object>                
             </v-tab-item>
         </v-tabs-items>
     </div>
@@ -40,6 +48,13 @@ export default {
   props: {
     msg: String
   },
+
+  methods: {
+      downloadPDF() {
+          window.open("/assets/resume.pdf")
+      }
+  },
+
   data () {
       return {
         tab: null,

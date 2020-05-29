@@ -3,9 +3,11 @@
         <h2 class="section-title">EDUCATION</h2>
 
         <div class="education-box">
-            <v-avatar>
+            <v-avatar
+                tile
+            >
                 <img
-                    src="https://cdn.vuetifyjs.com/images/john.jpg"
+                    src="/assets/KSU.svg"
                     alt="Kennesaw State University"
                 >
             </v-avatar>            
@@ -52,7 +54,7 @@ export default {
 
         display: grid;
         grid-template-columns: min-content auto;
-        column-gap: 5px;
+        column-gap: 12px;
 
         margin: 1rem 0;
     }

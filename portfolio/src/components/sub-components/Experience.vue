@@ -51,28 +51,62 @@ export default {
     data() {
         return {
             experienceList: [
-              {
-                  image: "https://cdn.vuetifyjs.com/images/john.jpg",
-                  employer: "Google",
-                  title: "STEP Intern",
-                  dates: "May 2020 - August 2020",
-                  bullets: [                      
-                      "Lorem ipsum dolor sit, amet consectetur adipisicing elit",
-                      "Quisquam quis sequi atque praesentium tempora dolore pariatur esse quidem explicabo",
-                      "Consectetur modi iste quos assumenda distinctio, tenetur cum odit, temporibus libero"
-                  ]
-              },
+                {
+                    image: "/assets/google.svg",
+                    employer: "Google",
+                    title: "STEP Intern",
+                    dates: "May 2020 - August 2020",
+                    bullets: []
+                },
 
-              {
-                  image: "https://cdn.vuetifyjs.com/images/john.jpg",
-                  employer: "Stanford",
-                  title: "Volunteer Section Leader",
-                  dates: "April 2020 - May 2020",
+                {
+                    image: "/assets/stanford.svg",
+                    employer: "Stanford",
+                    title: "Volunteer Section Leader",
+                    dates: "April 2020 - May 2020",
+                    bullets: [                      
+                        "Lorem ipsum dolor sit, amet consectetur adipisicing elit",
+                        "Quisquam quis sequi atque praesentium tempora dolore pariatur esse quidem explicabo",
+                        "Consectetur modi iste quos assumenda distinctio, tenetur cum odit, temporibus libero",
+                        "Consectetur modi iste quos assumenda distinctio, tenetur cum odit, temporibus libero"
+                    ]
+                },
+
+                {
+                    image: "/assets/motorola-fixed.svg",
+                    employer: "Motorla Solutions",
+                    title: "Software Engineering Intern",
+                    dates: "May 2019 - August 2019",
+                    bullets: [                      
+                        "Created fault alerts on radios that caught over 50 critical bugs and failures before reaching production",
+                        "Developed Python scripts to automate the transfer of logs and statistics between 3 internal company databases",
+                        "Worked across 4 teams to design and implement an error logging database using Azure Cloud and ElasticSearch",
+                        "Created and executed over 60 unit tests to detect flaws in proprietary software modules"
+                    ]
+                },
+
+                {
+                  image: "/assets/contractor.svg",
+                  employer: "Independent Software Contractor",
+                  title: "Software Developer",
+                  dates: "November 2016 - May 2019",
                   bullets: [                      
-                      "Lorem ipsum dolor sit, amet consectetur adipisicing elit",
-                      "Quisquam quis sequi atque praesentium tempora dolore pariatur esse quidem explicabo",
-                      "Consectetur modi iste quos assumenda distinctio, tenetur cum odit, temporibus libero",
-                      "Consectetur modi iste quos assumenda distinctio, tenetur cum odit, temporibus libero"
+                      "Created and utilized an incremental project management model to maintain constant contact with clients and their needs",
+                      "Designed and implemented a system to synchronize online and offline user data across multiple devices",
+                      "Designed and implemented a central hub for commanding and monitoring social media advertising bots",
+                      "Implemented a multi-tier recurring payment system using Stripe"
+                  ]
+                },
+
+                {
+                  image: "/assets/fulton.png",
+                  employer: "Fulton County Schools",
+                  title: "Network Engineer Shadow",
+                  dates: "May 2017 - July 2017",
+                  bullets: [                      
+                      "Worked alongside professional network engineers to set up and maintain physical network servers across 15 schools",
+                      "Monitored and recorded network performance across all Fulton schools using enterprise IT Management Software (Solarwinds)",
+                      "Participated in large scale deployment of factory images for over 1,000 devices",
                   ]
               }
           ]       
@@ -106,7 +140,7 @@ export default {
 
         display: grid;
         grid-template-columns: min-content auto;
-        column-gap: 5px;
+        column-gap: 12px;
 
         margin: 1rem 0;
     }

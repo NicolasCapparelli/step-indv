@@ -8,14 +8,25 @@
         
         <v-divider></v-divider>
         
+        <Projects/>
+
+        <v-divider></v-divider>        
+
         <Skills/>
+
+        <v-divider></v-divider>
+
+        <Awards/>
+
     </div>
 </template>
 
 <script>
 import Education from './Education'
 import Experience from './Experience'
+import Projects from './Projects'
 import Skills from './Skills'
+import Awards from './Awards'
 
 export default {
   name: 'Template',
@@ -25,7 +36,9 @@ export default {
   components: {
       Education,
       Experience,
-      Skills
+      Skills,
+      Projects,
+      Awards
   }
 }
 </script>
