@@ -1,17 +1,20 @@
 <template>
     <div id="nav-container"> 
-        <v-app-bar id="toolbar" app color="#343333" elevation="2">
-            <v-list-item two-line>
-                <v-list-item-avatar>
-                        <v-img src="https://cdn.vuetifyjs.com/images/lists/3.jpg"></v-img>
-                </v-list-item-avatar>
-                <v-list-item-content>                
-                    <v-list-item-title style="font-weight: bold;">Nicolas Capparelli</v-list-item-title>
-                    <v-list-item-subtitle>Software Engineer</v-list-item-subtitle>
-                </v-list-item-content>
-            </v-list-item>
+        <v-app-bar id="toolbar" app fixed color="#343333" elevation="2" height="auto">
+            <v-list id="toolbar-list">
+                <v-list-item two-line style="padding: 0;">
+                    <v-list-item-avatar>
+                            <v-img src="https://cdn.vuetifyjs.com/images/lists/3.jpg"></v-img>
+                    </v-list-item-avatar>
+                    <v-list-item-content>                
+                        <v-list-item-title style="font-weight: bold; font-size: 18px">Nicolas Capparelli</v-list-item-title>
+                        <v-list-item-subtitle style="font-size: 14px">Software Engineer</v-list-item-subtitle>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
+            
             <v-spacer></v-spacer>
-            <v-app-bar-nav-icon v-on:click="drawer = !drawer"></v-app-bar-nav-icon>
+            <v-app-bar-nav-icon v-on:click="drawer = !drawer" ></v-app-bar-nav-icon>
         </v-app-bar>
 
     <v-navigation-drawer
@@ -93,12 +96,20 @@ export default {
 <style>
 
     #nav-container {
-        width: 100%; 
+        width: 100%;
         height: auto;
+        overflow: hidden;
     }
 
     #toolbar {
         width: 100%;
+    }
+
+    #toolbar-list {
+        height: 100%;
+        width: 100%;
+        background-color: #343333;
+        padding: 0;
     }
 
     @media screen and (min-width: 1200px){

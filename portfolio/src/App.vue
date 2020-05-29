@@ -45,5 +45,7 @@ export default {
     #app {
         background-color: #292929;
         min-height: 100vh;
+        width: 100vw;
+        overflow: hidden;
     }
 </style>

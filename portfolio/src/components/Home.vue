@@ -7,6 +7,7 @@
 
         <div id="navigation-square-container">
             <v-sheet 
+                v-ripple
                 v-for="navSquare in navSquareList"
                 :key="navSquare.title"
                 class="navigation-square" 
@@ -75,7 +76,7 @@ export default {
         align-items: center;
         justify-content: flex-start;
 
-        padding: 16px;
+        padding: 100px 16px 16px 16px;
 
         background-color: transparent;
     }
@@ -103,12 +104,37 @@ export default {
         justify-content: flex-end;
         padding: 10% 0;
         
-        background-color: #424242
+        background-color: #424242;
+        cursor: pointer;
     }
 
     @media screen and (min-width: 1200px){
         #home-container {
-            padding: 0 20%;
+            padding: 15% 20% 5% 20%;
+        }
+
+        #landing-text {        
+            margin-bottom: 60px;
+        }
+
+        #landing-text h1 {        
+            font-size: 36px;
+        }
+
+        #landing-text p {        
+            font-size: 26px;
+        }
+
+        #navigation-square-container {
+            height: 100%;
+        }
+
+        .navigation-square {
+            height: 100%;
+        }
+
+        .navigation-square img {
+            width: 30%;
         }
     }
 
