@@ -1,8 +1,8 @@
 <template>
     <div id="home-container">
         <div id="landing-text">
-            <h1>Lorem ipsum dolor sit amet</h1>
-            <p>Repellat exercitationem totam quidem nemo dicta, ducimus, fugiat dolor tenetur sed obcaecati ipsum consectetur? Reiciendis explicabo.</p>
+            <h1>Hi. I'm Nico.</h1>
+            <p>I'm a Computer Science student with a deep passion for software engineering. Checkout some of my work below and feel free to get in touch</p>
         </div>
 
         <div id="navigation-square-container">
@@ -31,6 +31,9 @@ export default {
 
         // Navigates to respective route when a navigation square is clicked
         squareClickedHandler(navSquareTitle) {
+            
+            this.$root.$emit('pchange', navSquareTitle)
+            
             this.$router.push({
                 name: navSquareTitle
             })
@@ -110,7 +113,7 @@ export default {
 
     @media screen and (min-width: 1200px){
         #home-container {
-            padding: 15% 20% 5% 20%;
+            padding: 100px 20% 5% 20%;
         }
 
         #landing-text {        
@@ -127,14 +130,22 @@ export default {
 
         #navigation-square-container {
             height: 100%;
+            width: 60%;
+            grid-template-columns: auto auto;
         }
 
         .navigation-square {
             height: 100%;
+            width: 100%;
+            padding: 16px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
         }
 
         .navigation-square img {
-            width: 30%;
+            width: 40%;
         }
     }
 

@@ -4,7 +4,7 @@
             <v-list id="toolbar-list">
                 <v-list-item two-line style="padding: 0;">
                     <v-list-item-avatar>
-                            <v-img src="https://cdn.vuetifyjs.com/images/lists/3.jpg"></v-img>
+                            <v-img src="/assets/me.jpeg"></v-img>
                     </v-list-item-avatar>
                     <v-list-item-content>                
                         <v-list-item-title style="font-weight: bold; font-size: 18px">Nicolas Capparelli</v-list-item-title>
@@ -19,17 +19,13 @@
 
     <v-navigation-drawer
       v-model="drawer"
-      absolute
       temporary
+      fixed
       right
     >
       <v-list-item>
-            <v-list-item-avatar>
-                <v-img src="https://randomuser.me/api/portraits/men/78.jpg"></v-img>
-            </v-list-item-avatar>
-
             <v-list-item-content>
-                <v-list-item-title>Nicolas Capparelli</v-list-item-title>
+                <v-list-item-title>{{currentPage}}</v-list-item-title>
             </v-list-item-content>
       </v-list-item>
 
@@ -64,8 +60,15 @@ export default {
     msg: String
     },
 
+    created () {
+        this.$root.$on('pchange', data => {
+            this.currentPage = data
+        });      
+    },
+
     methods: {
         navigateTo(route) {
+            this.currentPage = route
             this.$router.push({
                 name: route
             })
@@ -75,6 +78,7 @@ export default {
     data () {
         return {
             drawer: false,
+            currentPage: "Home",
             pageList: [
                 {
                     name: "Home",
@@ -84,6 +88,21 @@ export default {
                 {
                     name: "Resume",
                     icon: "mdi-file"
+                },
+
+                {
+                    name: "Projects",
+                    icon: "mdi-code-greater-than-or-equal"
+                },
+
+                {
+                    name: "About",
+                    icon: "mdi-information-outline"
+                },
+
+                {
+                    name: "Connect",
+                    icon: "mdi-email"
                 }
             ]
         }
