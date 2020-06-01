@@ -60,6 +60,12 @@ export default {
     msg: String
     },
 
+    created () {
+        this.$root.$on('pchange', data => {
+            this.currentPage = data
+        });      
+    },
+
     methods: {
         navigateTo(route) {
             this.currentPage = route
@@ -92,6 +98,11 @@ export default {
                 {
                     name: "About",
                     icon: "mdi-information-outline"
+                },
+
+                {
+                    name: "Connect",
+                    icon: "mdi-email"
                 }
             ]
         }

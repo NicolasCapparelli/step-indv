@@ -31,6 +31,9 @@ export default {
 
         // Navigates to respective route when a navigation square is clicked
         squareClickedHandler(navSquareTitle) {
+            
+            this.$root.$emit('pchange', navSquareTitle)
+            
             this.$router.push({
                 name: navSquareTitle
             })

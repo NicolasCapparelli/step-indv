@@ -50,16 +50,23 @@ export default {
     async mounted() {
         try {
             const google = await gmapsInit();
-            const geocoder = new google.maps.Geocoder();
+            const geocoder = new google.maps.Geocoder();            
             const map = new google.maps.Map(document.getElementById('globe'));
 
-            geocoder.geocode({ address: 'Austria' }, (results, status) => {
-            if (status !== 'OK' || !results[0]) {
-                throw new Error(status);
-            }
+            geocoder.geocode({ address: 'Georgia' }, (results, status) => {
+                if (status !== 'OK' || !results[0]) {
+                    throw new Error(status);
+                }
 
-            map.setCenter(results[0].geometry.location);
-            map.fitBounds(results[0].geometry.viewport);
+                var marker = new google.maps.Marker({
+                    position: results[0].geometry.location,
+                    title: 'Hey there!'
+                });
+
+                map.setCenter(results[0].geometry.location);
+                map.fitBounds(results[0].geometry.viewport);
+                marker.setMap(map);
+            
             });
         } catch (error) {
             console.error(error);
@@ -99,9 +106,18 @@ export default {
         border-radius: 10px;
     }
 
+    #globe {
+        width: 100%; 
+        height: 250px
+    }
+
      @media screen and (min-width: 750px){
         #about-container {
             padding: 80px 20% 0px 20%;
+        }
+
+        #globe {
+            height: 450px
         }
      }
 
