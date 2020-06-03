@@ -65,10 +65,9 @@ export default {
                     title: "Volunteer Section Leader",
                     dates: "April 2020 - May 2020",
                     bullets: [                      
-                        "Lorem ipsum dolor sit, amet consectetur adipisicing elit",
-                        "Quisquam quis sequi atque praesentium tempora dolore pariatur esse quidem explicabo",
-                        "Consectetur modi iste quos assumenda distinctio, tenetur cum odit, temporibus libero",
-                        "Consectetur modi iste quos assumenda distinctio, tenetur cum odit, temporibus libero"
+                        "Participated in Stanford's Covid-19 online programming course as a section leader",
+                        "Taught programming principles to a group of 10 students on a weekly basis",
+                        "Section topics included: variables, loops, functions, arrays, image manipulation, and data science",
                     ]
                 },
 
