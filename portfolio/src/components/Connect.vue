@@ -31,6 +31,16 @@
                 >Send</v-btn>
             </div>
 
+            <v-select
+                v-model="numComments"
+                :items="numCommentOptions"
+                :color="colors.textPrimary"
+                label="Number of Comments"
+                style="width: 100px; margin: 1rem auto 0 0;" 
+                prepend-icon="filter_list"
+                single-line
+                v-on:change="getDataFromServer()"
+            ></v-select>
             <div id="comment-list">
                 <div 
                     class="comment"
@@ -63,7 +73,10 @@ export default {
         return {
             name: "",
             message: "",
+            
+            numComments: 5,
             commentList: [],
+            numCommentOptions: [5, 10, 15],
 
             colors: COLORS
         }
@@ -101,7 +114,7 @@ export default {
 
         getDataFromServer: async function () {
             
-            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/comments')
+            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/comments?numComments=' + this.numComments)
 
             // Parse epoch to formatted date
             if (response.ok) {
@@ -133,7 +146,7 @@ export default {
         align-items: center;
         justify-content: flex-start;
 
-        padding: 80px 16px 0px 16px;
+        padding: 80px 16px 25px 16px;
 
         background-color: #292929;
     }
