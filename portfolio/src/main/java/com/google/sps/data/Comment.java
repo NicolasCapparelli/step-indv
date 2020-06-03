@@ -1,6 +1,5 @@
 package com.google.sps.data;
 
-/** Class containing server statistics. */
 public final class Comment {
   String name;
   String message;
