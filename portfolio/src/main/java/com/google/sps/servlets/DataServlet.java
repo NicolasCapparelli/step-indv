@@ -41,8 +41,6 @@ import com.google.sps.data.Comment;
 @WebServlet("/comments")
 public class DataServlet extends HttpServlet {
 
-    ArrayList<Comment> commentList = new ArrayList<>();
-
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         
@@ -89,4 +87,5 @@ public class DataServlet extends HttpServlet {
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         datastore.put(taskEntity);
     }
+
 }
