@@ -14,14 +14,14 @@
                     style="width: 100%" 
                     label="Name"
                     v-model="name"
-                    color="#DBDBDB"
+                    :color="colors.textPrimary"
                     dark
                 ></v-text-field>
                 <v-textarea
                     v-model="message"
                     label="Message"
                     style="width: 100%" 
-                    color="#DBDBDB"
+                    :color="colors.textPrimary"
                     dark
                 ></v-textarea>
                 <v-btn
@@ -39,7 +39,7 @@
                 >
                     <div class="comment-header-container">
                         <h1 style="font-size: 18px">{{comment.name}}</h1>
-                        <span style="color: #a3a2a2; font-size: 14px">{{comment.timeCreated}}</span>
+                        <span style="color: #a3a2a2; font-size: 14px">{{comment.timestamp}}</span>
                     </div>
                     <p style="width: 100%">{{comment.message}}</p>
 
@@ -50,12 +50,12 @@
 </template>
 
 <script>
+import COLORS from '../utils/constants'
 export default {
     name: 'Connect',
 
     created () {
         this.getDataFromServer().then(function () {
-            console.log("Finished!")
         })
     },
     
@@ -63,7 +63,9 @@ export default {
         return {
             name: "",
             message: "",
-            commentList: []
+            commentList: [],
+
+            colors: COLORS
         }
     },
 
@@ -72,7 +74,7 @@ export default {
 
             const userName = this.name
             const userMessage = this.message
-            let response = await fetch('https://8080-dot-12454009-dot-devshell.appspot.com/comments', {
+            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/comments', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -85,11 +87,10 @@ export default {
             })
 
             if (response.ok) {
-                console.log("POST OK")
                 this.name = ""
                 this.message = ""
             } else {
-                console.log("POST ERR")  
+                alert("There appears to be a connection error, please try again later")
             }
 
 
@@ -99,15 +100,22 @@ export default {
         },
 
         getDataFromServer: async function () {
-            let response = await fetch('https://8080-dot-12454009-dot-devshell.appspot.com/comments')
+            
+            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/comments')
 
+            // Parse epoch to formatted date
             if (response.ok) {
-                let respData = await response.json()
-                console.log(respData)
-                this.commentList = respData
+                
+                let respData = await response.json()                
+                for (let comment of respData){
+                    
+                    let date = new Date(comment.timestamp)                    
+                    comment.timestamp = (date.getMonth() + 1).toString() + "/" + (date.getDay()).toString() +  "/"  + (date.getFullYear()).toString()
+                }
 
+                this.commentList = respData
             } else {
-                console.log("GET ERR")
+                alert("There appears to be a connection error, please try again later")
             }
         }
     }

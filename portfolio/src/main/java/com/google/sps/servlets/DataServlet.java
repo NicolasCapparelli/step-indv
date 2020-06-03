@@ -56,7 +56,7 @@ public class DataServlet extends HttpServlet {
         for (Entity entity : results.asIterable()) {
             String name = (String) entity.getProperty("name");
             String message = (String) entity.getProperty("message");
-            String timestamp = (String) entity.getProperty("timestamp");
+            long timestamp = (long) entity.getProperty("timestamp"); 
             long id = entity.getKey().getId();
 
             Comment newComment = new Comment(name, message, timestamp, id);
@@ -73,9 +73,7 @@ public class DataServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // To be used for timestamp
-        Date currentDate = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("mm-dd-yyyy");
-        String strDate = dateFormat.format(currentDate);
+        long timestamp = System.currentTimeMillis();
 
         // Create JSON object with GSON
         String requestData = request.getReader().lines().collect(Collectors.joining());
@@ -85,7 +83,7 @@ public class DataServlet extends HttpServlet {
         Entity taskEntity = new Entity("Comment");
         taskEntity.setProperty("name", comment.getName());
         taskEntity.setProperty("message", comment.getMessage());
-        taskEntity.setProperty("timestamp", strDate);
+        taskEntity.setProperty("timestamp", timestamp);
 
         // Placing Entity in datastore for persistant storage
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();

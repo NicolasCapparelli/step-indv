@@ -4,18 +4,14 @@ package com.google.sps.data;
 public final class Comment {
   String name;
   String message;
-  String timeCreated;
+  long timestamp;
   Long id;
 
-  public Comment(String name, String message,  String timestamp, Long id) {
+  public Comment(String name, String message,  long timestamp, Long id) {
     this.name = name;
     this.message = message;    
-    this.timeCreated = timestamp;
+    this.timestamp = timestamp;
     this.id = id;
-  }
-
-  public void setDate(String newDate) {
-    this.timeCreated = newDate;
   }
 
   public String getName() {
