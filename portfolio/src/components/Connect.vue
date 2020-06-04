@@ -1,5 +1,16 @@
 <template>
     <div id="connect-container">
+        
+        <v-alert 
+            id="connect-alert"
+            v-model="alert"
+            :type="alertType"
+            dismissible
+            elevation="3"
+            transition="scroll-y-transition"
+        >
+            {{alertMessage}}
+        </v-alert>
         <h1 style="width: 100%; margin-top: 1rem;">Connect</h1>
         <div id="social-media-container">            
             <img class="media-box" src="/assets/GitHub.svg" alt="linkedin">
@@ -27,22 +38,46 @@
                 <v-btn
                     v-on:click="sendComment()"
                     text
-                    style="margin: 0.5rem 0 0 auto;"
-                >Send</v-btn>
+                    style="position: relative; margin: 0.5rem 0 0 auto;"
+                    :disabled="isProcessingNewComment"
+                >
+                    Send
+                    <v-progress-circular
+                        v-if="isProcessingNewComment"
+                        style="position: absolute; background-color: #555555; width: 100%"
+                        indeterminate
+                        color="primary"
+                    ></v-progress-circular>
+                </v-btn>
             </div>
 
-            <v-select
-                v-model="numComments"
-                :items="numCommentOptions"
-                :color="colors.textPrimary"
-                label="Number of Comments"
-                style="width: 100px; margin: 1rem auto 0 0;" 
-                prepend-icon="filter_list"
-                single-line
-                v-on:change="getDataFromServer()"
-            ></v-select>
-            <div id="comment-list">
-                <div 
+            <div id="comment-actions-container">
+                <v-select
+                    v-model="numComments"
+                    v-bind:style="{ justifyContent: justifyActionBox}"
+                    :items="numCommentOptions"
+                    :color="colors.textPrimary"
+                    label="Number of Comments"
+                    style="max-width: 100px; margin-top: 1rem;" 
+                    prepend-icon="filter_list"
+                    single-line
+                    v-on:change="getDataFromServer()"
+                ></v-select>
+
+                 <v-btn 
+                    v-if="possibleAdmin"
+                    icon
+                    :color="colors.textPrimary"
+                    v-on:click="deleteComments()"
+                >
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </div>                
+            <div 
+                id="comment-list" 
+                v-if="firstLoadDone"
+            >
+                <div
                     class="comment"
                     v-for="(comment, index) in commentList"
                     :key="index"
@@ -55,6 +90,19 @@
 
                 </div>
             </div>
+
+            <div 
+                v-else
+                id="skeleton-load-container"
+            >
+                <v-skeleton-loader
+                    v-for="i in numComments"
+                    :key="i"
+                    style="width: 100%; margin-bottom: 1rem;"
+                    color="#555555"
+                    type="list-item-three-line"
+                ></v-skeleton-loader>
+            </div>
         </div>
     </div>
 </template>
@@ -66,7 +114,14 @@ export default {
 
     created () {
         this.getDataFromServer().then(function () {
-        })
+            this.firstLoadDone = true
+        }.bind(this))
+
+        let adminKey = getCookie("xcvd_admin_key_xcvi")
+        if (adminKey.length > 0) {
+            this.possibleAdmin = true;
+            this.adminKey = adminKey
+        }
     },
     
     data () {
@@ -78,12 +133,46 @@ export default {
             commentList: [],
             numCommentOptions: [5, 10, 15],
 
+            alertMessage: "",
+            alertType: "success",
+            alert: false,
+            
+            firstLoadDone: false,
+            isProcessingNewComment: false,
+
+            possibleAdmin: false,
+            justifyActionBox: "flex-start",
             colors: COLORS
         }
     },
 
     methods: {
+
+        getDataFromServer: async function () {
+            
+            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/comments?numComments=' + this.numComments)
+
+            // Parse epoch to formatted date
+            if (response.ok) {
+                
+                let respData = await response.json()                
+                for (let comment of respData){
+                    
+                    let date = new Date(comment.timestamp)                    
+                    comment.timestamp = (date.getMonth() + 1).toString() + "/" + (date.getDay()).toString() +  "/"  + (date.getFullYear()).toString()
+                }
+
+                this.commentList = respData
+            } else {
+                alert("There appears to be a connection error, please try again later")
+            }
+
+            this.isProcessingNewComment = false
+        },
+
         sendComment: async function() {
+            
+            this.isProcessingNewComment = true
 
             const userName = this.name
             const userMessage = this.message
@@ -106,37 +195,63 @@ export default {
                 alert("There appears to be a connection error, please try again later")
             }
 
+            this.isProcessingNewComment = false
 
             // Call the get command to update the UI with the comment sent via the POST above
             await this.getDataFromServer()
 
         },
 
-        getDataFromServer: async function () {
-            
-            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/comments?numComments=' + this.numComments)
+        deleteComments: async function () {
+            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/delete-data', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    adminKey: this.adminKey
+                })
+            })
 
-            // Parse epoch to formatted date
             if (response.ok) {
                 
-                let respData = await response.json()                
-                for (let comment of respData){
-                    
-                    let date = new Date(comment.timestamp)                    
-                    comment.timestamp = (date.getMonth() + 1).toString() + "/" + (date.getDay()).toString() +  "/"  + (date.getFullYear()).toString()
-                }
+                this.alertType = "success"
+                this.alertMessage = "Comments delete successfully"
 
-                this.commentList = respData
+                // Call the get command to update the UI with the comment sent via the POST above
+                await this.getDataFromServer()
             } else {
-                alert("There appears to be a connection error, please try again later")
+                this.alertType = "error"
+                this.alertMessage = "You are not in the sudoers file, this incident will be reported"
             }
+
+            this.alert = true
         }
     }
+}
+
+
+// Cookie reading function from https://www.w3schools.com/js/js_cookies.asp 
+function getCookie(cname) {
+    var name = cname + "="
+    var decodedCookie = document.cookie
+    var ca = decodedCookie.split(';')
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i]
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1)
+        }
+
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length)
+        }
+    }
+    return ""
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
     #connect-container {
         height: 100%;
         width: 100%;
@@ -149,6 +264,14 @@ export default {
         padding: 80px 16px 25px 16px;
 
         background-color: #292929;
+    }
+
+    #connect-alert {
+        position: absolute;
+        max-width: 800px;
+        z-index: 10;
+        width: 90%; 
+        margin: 2rem auto;
     }
 
     #social-media-container {
@@ -168,6 +291,15 @@ export default {
         width: 90%
     }
 
+    #skeleton-load-container {
+        width: 100%;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
     #comments-container {
         width: 100%;
 
@@ -179,7 +311,15 @@ export default {
 
     #message-input-container {
         box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12), 0 2px 4px -1px rgba(0,0,0,0.20);
+    }
 
+    #comment-actions-container {
+        width: 100%;
+        
+        display: flex;
+        flex-direction: row;
+        align-items: center;        
+        justify-content: space-between;
     }
 
     #comment-list {
@@ -216,6 +356,11 @@ export default {
         padding: 16px;
 
         border-radius: 2px;
+        background-color: #555555;
+    }
+
+    /* Have to override this to get the right background color */
+    .theme--dark.v-skeleton-loader .v-skeleton-loader__actions, .theme--dark.v-skeleton-loader .v-skeleton-loader__article, .theme--dark.v-skeleton-loader .v-skeleton-loader__card-heading, .theme--dark.v-skeleton-loader .v-skeleton-loader__card-text, .theme--dark.v-skeleton-loader .v-skeleton-loader__date-picker, .theme--dark.v-skeleton-loader .v-skeleton-loader__list-item, .theme--dark.v-skeleton-loader .v-skeleton-loader__list-item-avatar, .theme--dark.v-skeleton-loader .v-skeleton-loader__list-item-avatar-three-line, .theme--dark.v-skeleton-loader .v-skeleton-loader__list-item-avatar-two-line, .theme--dark.v-skeleton-loader .v-skeleton-loader__list-item-text, .theme--dark.v-skeleton-loader .v-skeleton-loader__list-item-three-line, .theme--dark.v-skeleton-loader .v-skeleton-loader__list-item-two-line, .theme--dark.v-skeleton-loader .v-skeleton-loader__table-heading, .theme--dark.v-skeleton-loader .v-skeleton-loader__table-tbody, .theme--dark.v-skeleton-loader .v-skeleton-loader__table-tfoot, .theme--dark.v-skeleton-loader .v-skeleton-loader__table-thead{
         background-color: #555555;
     }
 
