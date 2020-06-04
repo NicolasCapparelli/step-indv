@@ -77,18 +77,12 @@
                 id="comment-list" 
                 v-if="firstLoadDone"
             >
-                <div
-                    class="comment"
-                    v-for="(comment, index) in commentList"
-                    :key="index"
-                >
-                    <div class="comment-header-container">
-                        <h1 style="font-size: 18px">{{comment.name}}</h1>
-                        <span style="color: #a3a2a2; font-size: 14px">{{comment.timestamp}}</span>
-                    </div>
-                    <p style="width: 100%">{{comment.message}}</p>
-
-                </div>
+                <Comment
+                    v-for="comment in commentList"
+                    :key="comment.id"
+                    :commentData="comment"
+                    :successfulChangeCallback="getDataFromServer"
+                />
             </div>
 
             <div 
@@ -109,6 +103,7 @@
 
 <script>
 import COLORS from '../utils/constants'
+import Comment from './sub-components/Comment'
 export default {
     name: 'Connect',
 
@@ -144,6 +139,10 @@ export default {
             justifyActionBox: "flex-start",
             colors: COLORS
         }
+    },
+
+    components: {
+        Comment
     },
 
     methods: {
@@ -226,7 +225,7 @@ export default {
             }
 
             this.alert = true
-        }
+        }        
     }
 }
 

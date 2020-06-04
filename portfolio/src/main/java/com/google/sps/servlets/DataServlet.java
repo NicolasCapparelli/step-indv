@@ -28,6 +28,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.FetchOptions;
+import static java.lang.Math.toIntExact;
 
 import java.util.List; 
 import java.util.Date;
@@ -42,7 +43,7 @@ import com.google.sps.data.Comment;
 @WebServlet("/comments")
 public class DataServlet extends HttpServlet {
 
-    @Override
+    @Override // Retrieves x comments
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // Number of comments to return to the use
@@ -66,9 +67,13 @@ public class DataServlet extends HttpServlet {
             String name = (String) entity.getProperty("name");
             String message = (String) entity.getProperty("message");
             long timestamp = (long) entity.getProperty("timestamp"); 
+            
+            int upvotes = toIntExact((long) entity.getProperty("upvotes"));
+            int downvotes = toIntExact((long) entity.getProperty("downvotes"));
+            
             long id = entity.getKey().getId();
 
-            Comment newComment = new Comment(name, message, timestamp, id);
+            Comment newComment = new Comment(name, message, timestamp, upvotes, downvotes, id);
             commentList.add(newComment);
         }
 
@@ -78,7 +83,7 @@ public class DataServlet extends HttpServlet {
         response.getWriter().println(gson.toJson(commentList));
     }
 
-    @Override
+    @Override // Creates a new comment
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // To be used for timestamp
@@ -93,6 +98,10 @@ public class DataServlet extends HttpServlet {
         taskEntity.setProperty("name", comment.getName());
         taskEntity.setProperty("message", comment.getMessage());
         taskEntity.setProperty("timestamp", timestamp);
+
+        int defaultRating = 0;
+        taskEntity.setProperty("upvotes", defaultRating);
+        taskEntity.setProperty("downvotes", defaultRating);
 
         // Placing Entity in datastore for persistant storage
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
