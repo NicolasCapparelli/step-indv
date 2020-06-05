@@ -29,6 +29,12 @@
             </v-list-item-content>
       </v-list-item>
 
+      <v-list-item v-if="isUserLoggedIn">
+            <v-list-item-content>
+                <v-list-item-title>{{userEmail}}</v-list-item-title>
+            </v-list-item-content>
+      </v-list-item>
+
       <v-divider></v-divider>
 
       <v-list>
@@ -47,6 +53,20 @@
                 </v-list-item-content>
             </v-list-item>
 
+            <v-list-item 
+                v-if="isUserLoggedIn"
+                v-on:click="logout()"
+                link
+            >
+                <v-list-item-icon>
+                    <v-icon>mdi-account</v-icon>
+                </v-list-item-icon>
+
+                <v-list-item-content>
+                    <v-list-item-title>Logout</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+
         </v-list>
     </v-navigation-drawer>
 
@@ -54,16 +74,19 @@
 </template>
 
 <script>
+import { WEBSITE_URL } from '../utils/constants'
 export default {
     name: 'Template',
-    props: {
-    msg: String
-    },
 
     created () {
         this.$root.$on('pchange', data => {
             this.currentPage = data
         });      
+
+        this.$root.$on('authCheck', data => {
+            this.isUserLoggedIn = data.isLoggedIn
+            this.userEmail = data.email
+        });
     },
 
     methods: {
@@ -72,6 +95,18 @@ export default {
             this.$router.push({
                 name: route
             })
+        },
+
+
+        logout: async function () {
+            let response = await fetch(WEBSITE_URL + '/authenticate')
+
+            if (response.ok) {
+                let respObject = await response.json()
+                location.href = respObject.authURL
+            } else {
+                alert("There was an issue processing your request, please try again later")
+            }   
         }
     },
 

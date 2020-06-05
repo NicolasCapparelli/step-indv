@@ -8,6 +8,7 @@ import Resume from './components/Resume'
 import Projects from './components/Projects'
 import About from './components/About'
 import Connect from './components/Connect'
+import Authenticate from './components/Authenticate'
 
 Vue.config.productionTip = false
 Vue.use(VueRouter)
@@ -18,7 +19,8 @@ const routes = [
   { name: "Resume", path:"/resume", component: Resume },
   { name: "Projects", path:"/projects", component: Projects },
   { name: "About", path:"/about", component: About },
-  { name: "Connect", path:"/connect", component: Connect }
+  { name: "Connect", path:"/connect", component: Connect },
+  { name: "Authenticate", path:"/auth", component: Authenticate }
 ]
 
 const router = new VueRouter({

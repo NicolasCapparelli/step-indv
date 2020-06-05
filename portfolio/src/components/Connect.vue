@@ -36,6 +36,7 @@
                     dark
                 ></v-textarea>
                 <v-btn
+                    v-if="isUserLoggedIn"
                     v-on:click="sendComment()"
                     text
                     style="position: relative; margin: 0.5rem 0 0 auto;"
@@ -48,6 +49,15 @@
                         indeterminate
                         color="primary"
                     ></v-progress-circular>
+                </v-btn>
+
+                <v-btn
+                    v-else
+                    v-on:click="authenticate()"
+                    text
+                    style="position: relative; margin: 0.5rem 0 0 auto;"
+                >
+                    Login to comment
                 </v-btn>
             </div>
 
@@ -102,15 +112,16 @@
 </template>
 
 <script>
-import COLORS from '../utils/constants'
+import {COLORS, WEBSITE_URL} from '../utils/constants'
 import Comment from './sub-components/Comment'
+
 export default {
     name: 'Connect',
 
-    created () {
-        this.getDataFromServer().then(function () {
-            this.firstLoadDone = true
-        }.bind(this))
+    async created () {
+
+        await this.getDataFromServer()
+        this.firstLoadDone = true
 
         let adminKey = getCookie("xcvd_admin_key_xcvi")
         if (adminKey.length > 0) {
@@ -118,11 +129,17 @@ export default {
             this.adminKey = adminKey
         }
     },
+
+    async mounted () {
+        await this.checkAuth()
+    },
     
     data () {
         return {
             name: "",
             message: "",
+
+            isUserLoggedIn: false,
             
             numComments: 5,
             commentList: [],
@@ -147,9 +164,32 @@ export default {
 
     methods: {
 
+        checkAuth: async function() {
+            let response = await fetch(WEBSITE_URL + '/checkAuth')            
+
+            if (response.ok){
+
+                let respObject = await response.json()         
+                this.isUserLoggedIn = respObject.isLoggedIn;
+
+                this.$root.$emit('authCheck', respObject)
+            }
+        },
+
+        authenticate: async function () {
+            let response = await fetch(WEBSITE_URL + '/authenticate')
+
+            if (response.ok) {
+                let respObject = await response.json()
+                location.href = respObject.authURL
+            } else {
+                alert("There was an issue processing your request, please try again later")
+            }                
+        },
+
         getDataFromServer: async function () {
             
-            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/comments?numComments=' + this.numComments)
+            let response = await fetch(WEBSITE_URL + '/comments?numComments=' + this.numComments)
 
             // Parse epoch to formatted date
             if (response.ok) {
@@ -175,7 +215,7 @@ export default {
 
             const userName = this.name
             const userMessage = this.message
-            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/comments', {
+            let response = await fetch(WEBSITE_URL + '/comments', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -202,7 +242,7 @@ export default {
         },
 
         deleteComments: async function () {
-            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/delete-data', {
+            let response = await fetch(WEBSITE_URL + '/delete-data', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

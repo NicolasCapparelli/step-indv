@@ -28,6 +28,9 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
 import static java.lang.Math.toIntExact;
 
 import java.util.List; 
@@ -56,7 +59,7 @@ public class DataServlet extends HttpServlet {
         
         
         // Retrieving Comments from DataStore
-        Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
+        Query query = new Query("Comment").addSort("timestamp", SortDirection.ASCENDING);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         PreparedQuery results = datastore.prepare(query);
 
@@ -86,6 +89,17 @@ public class DataServlet extends HttpServlet {
     @Override // Creates a new comment
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
+        UserService userService = UserServiceFactory.getUserService();
+        
+        if (userService.isUserLoggedIn()) {
+            createCommnet(request);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+        
+    }
+
+    private void createCommnet(HttpServletRequest request) throws IOException {
         // To be used for timestamp
         long timestamp = System.currentTimeMillis();
 
