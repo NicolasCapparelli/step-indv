@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Argument validation
+if [ $# -gt 0 ] && [ "$1" != "r" ] && [ "$1" != "d" ]; then
+    echo "argument $1 is invalid"
+    exit
+fi
+
+# Build vue project
+npm run build
+
+# Remove old distribution files from appengine deploy folder
+rm -r src/main/webapp/*
+
+# Copy the new distributino files from /dist to /webapp
+cp -a dist/. src/main/webapp
+
+
+if [ $# -eq 0 ]; then
+    echo "No argument provided, will not run or deploy"
+    exit
+elif [ "$1" = "r" ]; then
+    mvn package appengine:run
+elif [ "$1" = "d" ]; then
+    mvn package appengine:deploy
+fi

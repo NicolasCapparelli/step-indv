@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import {WEBSITE_URL} from '../../utils/constants'
 export default {
     name: 'Comment',
     props: {
@@ -43,8 +44,8 @@ export default {
         successfulChangeCallback: Function
     },
     methods: {
-        commentRatingChange: async function(isUpvote) {
-            let response = await fetch('https://8080-b83fc153-d2cf-481d-a321-9342cdf80f21.us-east1.cloudshell.dev/rating', {
+        commentRatingChange: async function(isUpvote) {    
+            let response = await fetch(WEBSITE_URL + '/rating', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

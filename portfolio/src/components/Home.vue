@@ -22,12 +22,31 @@
 </template>
 
 <script>
+import { WEBSITE_URL } from '../utils/constants'
+
 export default {
     name: 'Home',
+
+    async mounted () {
+        await this.checkAuth()
+    },
+
     props: {
     msg: String
     },
     methods: {
+
+        checkAuth: async function() {
+            let response = await fetch(WEBSITE_URL + '/checkAuth')            
+
+            if (response.ok){
+
+                let respObject = await response.json()         
+                this.isUserLoggedIn = respObject.isLoggedIn;
+
+                this.$root.$emit('authCheck', respObject)
+            }
+        },        
 
         // Navigates to respective route when a navigation square is clicked
         squareClickedHandler(navSquareTitle) {
