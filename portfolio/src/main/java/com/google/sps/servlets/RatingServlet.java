@@ -28,7 +28,9 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Key;
+import static java.lang.Math.toIntExact;
 
 import java.util.List; 
 import java.util.Date;
@@ -37,41 +39,43 @@ import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors; 
-import com.google.sps.data.DeleteData;
+import com.google.sps.data.RatingData;
 
-/** Endpoint for deleting comments. Has 'security'*/
-@WebServlet("/delete-data")
-public class DeleteServlet extends HttpServlet {
-
-    private final String key = "Almost pushed it this time, but I remembered last second :)";
+/** Endpoint for updating comment ratings'*/
+@WebServlet("/rating")
+public class RatingServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         // Create JSON object with GSON
         String requestData = request.getReader().lines().collect(Collectors.joining());
-        DeleteData deleteData = new Gson().fromJson(requestData, DeleteData.class);    
+        RatingData ratingData = new Gson().fromJson(requestData, RatingData.class);    
 
-        // Delete all comments if credentials match
-        if (deleteData.getKey().equals(key)) {
-            deleteAllComments();
+        // Grab target comment with key created from commentID
+        Key commentKey = KeyFactory.createKey("Comment", ratingData.getID());
+        
+        // Attempt to retrieve comment from datastore with Key
+        Entity comment;
+        try {
+            comment = datastore.get(commentKey);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        
+        
+        if (ratingData.isUpvote()) {
+            int upvotes = toIntExact((long) comment.getProperty("upvotes"));
+            comment.setProperty("upvotes", ++upvotes);
         } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            int downvotes = toIntExact((long) comment.getProperty("downvotes"));
+            comment.setProperty("downvotes", ++downvotes);
         }
-    }
-
-    private void deleteAllComments () {
         
-        // Retrieve all comments from DataStore to get their key which is needed to delete
-        Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        PreparedQuery results = datastore.prepare(query);
-
-        
-        for (Entity entity : results.asIterable() ) {
-            Key commentKey = entity.getKey();
-            datastore.delete(commentKey);
-        }
+        datastore.put(comment);        
     }
 
 }
