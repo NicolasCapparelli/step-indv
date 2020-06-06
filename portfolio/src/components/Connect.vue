@@ -19,7 +19,9 @@
         </div>
 
         <h1 style="width: 100%;">Leave a Comment</h1>
+        
         <div id="comments-container">
+
             <div id="message-input-container" class="comment">
                 <v-text-field 
                     style="width: 100%" 
@@ -71,8 +73,26 @@
                     style="max-width: 100px; margin-top: 1rem;" 
                     prepend-icon="filter_list"
                     single-line
-                    v-on:change="getDataFromServer()"
+                    v-on:change="changeNumComments()"
                 ></v-select>
+
+                <div id="pagination-container">
+                    <v-btn 
+                        icon
+                        v-on:click="changeCommentPage(false)"
+                    >
+                        <v-icon>mdi-chevron-left</v-icon>
+                    </v-btn>
+
+                    <span style="margin: 0 0.5rem;">{{page}}</span>
+
+                    <v-btn 
+                        icon
+                        v-on:click="changeCommentPage(true)"
+                    >
+                        <v-icon>mdi-chevron-right</v-icon>
+                    </v-btn>
+                </div>
 
                  <v-btn 
                     v-if="possibleAdmin"
@@ -83,6 +103,7 @@
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
             </div>                
+            
             <div 
                 id="comment-list" 
                 v-if="firstLoadDone"
@@ -91,12 +112,12 @@
                     v-for="comment in commentList"
                     :key="comment.id"
                     :commentData="comment"
-                    :successfulChangeCallback="getDataFromServer"
+                    :successfulChangeCallback="commentSuccessCallback"
                 />
             </div>
 
             <div 
-                v-else
+                v-if="!firstLoadDone"
                 id="skeleton-load-container"
             >
                 <v-skeleton-loader
@@ -108,6 +129,7 @@
                 ></v-skeleton-loader>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -120,7 +142,8 @@ export default {
 
     async created () {
 
-        await this.getDataFromServer()
+        let respData = await this.getDataFromServer()
+        this.updateCommentList(respData)
         this.firstLoadDone = true
 
         let adminKey = getCookie("xcvd_admin_key_xcvi")
@@ -141,6 +164,8 @@ export default {
 
             isUserLoggedIn: false,
             
+            page: 1,
+            lastPage: Number.MAX_SAFE_INTEGER,
             numComments: 5,
             commentList: [],
             numCommentOptions: [5, 10, 15],
@@ -187,26 +212,31 @@ export default {
             }                
         },
 
-        getDataFromServer: async function () {
+        getDataFromServer: async function () {        
             
-            let response = await fetch(WEBSITE_URL + '/comments?numComments=' + this.numComments)
-
-            // Parse epoch to formatted date
-            if (response.ok) {
-                
-                let respData = await response.json()                
-                for (let comment of respData){
-                    
-                    let date = new Date(comment.timestamp)                    
-                    comment.timestamp = (date.getMonth() + 1).toString() + "/" + (date.getDay()).toString() +  "/"  + (date.getFullYear()).toString()
-                }
-
-                this.commentList = respData
+            let response = await fetch(WEBSITE_URL + '/comments?numComments=' + this.numComments + "&page=" + this.page)
+            let respData;
+            
+            if (response.ok) {                
+                respData = await response.json()                 
             } else {
                 alert("There appears to be a connection error, please try again later")
+                respData = []
             }
 
             this.isProcessingNewComment = false
+            return respData
+        },
+
+        updateCommentList: function (respData) {
+            
+            // Format timestamp to MM/DD/YYYY
+            for (let comment of respData){                    
+                let date = new Date(comment.timestamp)                    
+                comment.timestamp = (date.getMonth() + 1).toString() + "/" + (date.getDay()).toString() +  "/"  + (date.getFullYear()).toString()
+            }
+
+            this.commentList = respData
         },
 
         sendComment: async function() {
@@ -237,7 +267,8 @@ export default {
             this.isProcessingNewComment = false
 
             // Call the get command to update the UI with the comment sent via the POST above
-            await this.getDataFromServer()
+            let respData = await this.getDataFromServer()
+            this.updateCommentList(respData)
 
         },
 
@@ -258,14 +289,74 @@ export default {
                 this.alertMessage = "Comments delete successfully"
 
                 // Call the get command to update the UI with the comment sent via the POST above
-                await this.getDataFromServer()
+                let respData = await this.getDataFromServer()
+                this.updateCommentList(respData)
             } else {
                 this.alertType = "error"
                 this.alertMessage = "You are not in the sudoers file, this incident will be reported"
             }
 
             this.alert = true
-        }        
+        },
+
+        commentSuccessCallback: async function () {
+            let respData = await this.getDataFromServer()
+            console.log(respData)
+            this.updateCommentList(respData)
+        },
+
+        changeNumComments: async function() {
+
+            // Reset last page value since there will be a new number of comments per page
+            this.lastPage = Number.MAX_SAFE_INTEGER            
+
+            let respData = await this.getDataFromServer()
+
+            if (respData.length < 1){
+                // Set the last page as the current page, as there are no comments in the current page
+                this.lastPage = this.page - 1
+
+                // If the current page is not 1, then show user the previous page. If it is 1 it means there are no comments at all, so do nothing
+                this.page != 1 && (this.page -= 1)
+
+                let respData = await this.getDataFromServer()
+                
+                this.updateCommentList(respData)
+                
+                return
+            }
+
+            this.updateCommentList(respData)
+        },
+
+        changeCommentPage: async function (isForward) {
+            if (isForward) {
+                if (this.page < this.lastPage){this.page += 1}                
+            }
+
+            else {
+                if (this.page > 1){ this.page -= 1 }                
+            }
+            
+            // Get data for new comments page
+            let respData = await this.getDataFromServer()
+
+            if (respData.length < 1){
+
+                // Set the last page as the current page, as there are no comments in the current page
+                this.lastPage = this.page - 1
+
+                // If the current page is not 1, then show user the previous page. If it is 1 it means there are no comments at all, so do nothing
+                this.page != 1 && (this.page -= 1)
+                
+                return
+            } 
+            
+            else { 
+                this.updateCommentList(respData)
+            }
+        }
+
     }
 }
 
@@ -396,6 +487,17 @@ function getCookie(cname) {
 
         border-radius: 2px;
         background-color: #555555;
+    }
+
+
+    #pagination-container {
+        display: flex;
+        width: 100%;
+
+        align-items: center;
+        justify-content: center;
+
+        margin-top: 1rem;
     }
 
     /* Have to override this to get the right background color */

@@ -32,6 +32,7 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 import static java.lang.Math.toIntExact;
+import static java.lang.Math.min;
 
 import java.util.List; 
 import java.util.Date;
@@ -51,13 +52,15 @@ public class DataServlet extends HttpServlet {
 
         // Number of comments to return to the use
         int numComments;
+        int page;
         try {
             numComments = Integer.parseInt(request.getParameter("numComments"));
+            page = Integer.parseInt(request.getParameter("page"));
         } catch (NumberFormatException e) {
-            numComments = 2;
+            numComments = 5;
+            page = 1;
         }
-        
-        
+                
         // Retrieving Comments from DataStore
         Query query = new Query("Comment").addSort("timestamp", SortDirection.ASCENDING);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -65,8 +68,15 @@ public class DataServlet extends HttpServlet {
 
         // Create ArrayList of all comments retrieved form DataStore
         List<Comment> commentList = new ArrayList<>();
-        for (Entity entity : results.asList(FetchOptions.Builder.withLimit(numComments)) ) {            
+        
+        // Calculating start and end index
+        int startIndex = (page * numComments) - (numComments);
+        List<Entity> entityList = results.asList(FetchOptions.Builder.withLimit(numComments * page));
+        int endIndex = min(startIndex + (numComments + 1), entityList.size());
 
+        for (int i = startIndex; i < endIndex; i++) {
+            
+            Entity entity = entityList.get(i);
             String name = (String) entity.getProperty("name");
             String message = (String) entity.getProperty("message");
             long timestamp = (long) entity.getProperty("timestamp"); 
@@ -77,8 +87,9 @@ public class DataServlet extends HttpServlet {
             long id = entity.getKey().getId();
 
             Comment newComment = new Comment(name, message, timestamp, upvotes, downvotes, id);
-            commentList.add(newComment);
+            commentList.add(newComment);        
         }
+    
 
         // Convert commentList to JSON and send response
         Gson gson = new Gson();

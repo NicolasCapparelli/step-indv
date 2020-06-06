@@ -43,7 +43,7 @@ import com.google.sps.data.DeleteData;
 @WebServlet("/delete-data")
 public class DeleteServlet extends HttpServlet {
 
-    private final String key = "Almost pushed it this time, but I remembered last second :)";
+    private final String key = "NoAccessToMemeGenOrBadgesMakesMeSad";
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
