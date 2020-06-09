@@ -1,20 +1,23 @@
 <template>
     <div id="nav-container"> 
         <v-app-bar id="toolbar" app fixed color="#343333" elevation="2" height="auto">
-            <v-list id="toolbar-list">
-                <v-list-item two-line style="padding: 0;">
-                    <v-list-item-avatar>
-                            <v-img src="/assets/me.jpeg"></v-img>
-                    </v-list-item-avatar>
-                    <v-list-item-content>                
-                        <v-list-item-title style="font-weight: bold; font-size: 18px">Nicolas Capparelli</v-list-item-title>
-                        <v-list-item-subtitle style="font-size: 14px">Software Engineer</v-list-item-subtitle>
-                    </v-list-item-content>
-                </v-list-item>
-            </v-list>
             
-            <v-spacer></v-spacer>
-            <v-app-bar-nav-icon v-on:click="drawer = !drawer" ></v-app-bar-nav-icon>
+            <div id="toolbar-content-container">
+                <v-list id="toolbar-list">
+                    <v-list-item two-line style="padding: 0;">
+                        <v-list-item-avatar>
+                                <v-img src="/assets/me.jpeg"></v-img>
+                        </v-list-item-avatar>
+                        <v-list-item-content>                
+                            <v-list-item-title style="font-weight: bold; font-size: 18px">Nicolas Capparelli</v-list-item-title>
+                            <v-list-item-subtitle style="font-size: 14px">Software Engineer</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
+                
+                <v-spacer></v-spacer>
+                <v-app-bar-nav-icon v-on:click="drawer = !drawer" ></v-app-bar-nav-icon>
+            </div>
         </v-app-bar>
 
     <v-navigation-drawer
@@ -159,17 +162,20 @@ export default {
         width: 100%;
     }
 
+    #toolbar-content-container {
+        width: 100%; 
+        max-width: 900px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        margin: auto;
+    }
+
     #toolbar-list {
         height: 100%;
         width: 100%;
         background-color: #343333;
         padding: 0;
-    }
-
-    @media screen and (min-width: 1200px){
-        #toolbar {
-            padding: 0 20%;
-        }
     }
 
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div id="project-container">
+    <div class="page-container" id="project-container">
         <v-combobox
             item-color="#999999"
             color="#FFFFFF"
@@ -166,19 +166,8 @@ export default {
 
 <style scoped>
     #project-container {
-        height: 100%;
-        width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-
         padding: 80px 16px 0px 16px;
-
-        background-color: #292929;
     }
-
 
     #project-list {
         height: 100%;
@@ -192,20 +181,8 @@ export default {
     }
 
     @media screen and (min-width: 1200px){
-        #project-container {
-            padding: 80px 20% 0px 20%;
-            justify-content: center;
-        }
 
-        #project-list {
-            display: grid;
-            grid-template-columns: 49% 49%;
-            grid-auto-rows: min-content;
-            align-items: start;
-            justify-items: start;
 
-            column-gap: 1rem;
-        }
     }
 
 </style>

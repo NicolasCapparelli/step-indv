@@ -1,5 +1,5 @@
 <template>
-    <div id="resume-container">
+    <div class="page-container" id="resume-container">
         <v-tabs 
             v-model="tab"
             style="width: 100%"     
@@ -70,17 +70,7 @@ export default {
 <style scoped>
 
     #resume-container {
-        height: 100%;
-        width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-
         padding: 80px 0px 0px 0px;
-
-        background-color: #292929;
     }
 
     #resume-tab-item-container {
@@ -93,13 +83,6 @@ export default {
         height: 100%;
         width: 100%;
         background-color: #292929;
-    }
-
-    @media screen and (min-width: 1200px){
-        #resume-container {
-            padding: 80px 20% 0px 20%;
-            justify-content: center;
-        }
     }
 
 </style>

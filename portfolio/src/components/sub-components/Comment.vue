@@ -68,6 +68,17 @@ export default {
 </script>
 
 <style scoped>
+
+    .comment-header-container {
+        width: 100%;
+        height: auto;
+        
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 0.5rem;
+    }
     .comment {
         height: fit-content;
         width: 100%;

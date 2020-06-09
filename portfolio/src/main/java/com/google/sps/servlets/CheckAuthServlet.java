@@ -50,7 +50,5 @@ public class CheckAuthServlet extends HttpServlet {
             json += "\"" + userEmail + "\"";
             json += "}";
         return json;
-    }
-
-    
+    }    
 }

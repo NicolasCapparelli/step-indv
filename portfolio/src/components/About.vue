@@ -1,5 +1,5 @@
 <template>
-    <div id="about-container">
+    <div class="page-container" id="about-container">
 
         <div class="about-section">
             <h1 class="section-title">Info</h1>
@@ -82,17 +82,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     #about-container {
-        height: 100%;
-        width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-
         padding: 80px 16px 0px 16px;
-
-        background-color: #292929;
     }
 
     .about-section {
@@ -112,9 +102,6 @@ export default {
     }
 
      @media screen and (min-width: 750px){
-        #about-container {
-            padding: 80px 20% 0px 20%;
-        }
 
         #globe {
             height: 450px

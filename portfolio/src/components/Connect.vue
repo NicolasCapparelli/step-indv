@@ -1,5 +1,5 @@
 <template>
-    <div id="connect-container">
+    <div class="page-container" id="connect-container">
         
         <v-alert 
             id="connect-alert"
@@ -13,387 +13,57 @@
         </v-alert>
         <h1 style="width: 100%; margin-top: 1rem;">Connect</h1>
         <div id="social-media-container">            
-            <img class="media-box" src="/assets/GitHub.svg" alt="linkedin">
-            <img class="media-box" src="/assets/GitHub.svg" alt="linkedin">
-            <img class="media-box" src="/assets/GitHub.svg" alt="linkedin">
+            <a class="media-box" href="https://github.com/NicolasCapparelli">
+                <img src="/assets/GitHub.svg" alt="github" >
+            </a>
+    
+            <a class="media-box" style="display: flex; align-items: center; justify-content: center;" href="https://linkedin.com/in/NicolasCapparelli">
+                <img style="width: 80%;" src="/assets/linkedin-logo-white.svg" alt="linkedin">
+            </a>
+    
+            <a class="media-box" href="mailto:capparellinicog@hotmail.com">
+                <img style="width: 100%" src="/assets/email-white.svg" alt="email">
+            </a>
         </div>
 
         <h1 style="width: 100%;">Leave a Comment</h1>
-        
-        <div id="comments-container">
-
-            <div id="message-input-container" class="comment">
-                <v-text-field 
-                    style="width: 100%" 
-                    label="Name"
-                    v-model="name"
-                    :color="colors.textPrimary"
-                    dark
-                ></v-text-field>
-                <v-textarea
-                    v-model="message"
-                    label="Message"
-                    style="width: 100%" 
-                    :color="colors.textPrimary"
-                    dark
-                ></v-textarea>
-                <v-btn
-                    v-if="isUserLoggedIn"
-                    v-on:click="sendComment()"
-                    text
-                    style="position: relative; margin: 0.5rem 0 0 auto;"
-                    :disabled="isProcessingNewComment"
-                >
-                    Send
-                    <v-progress-circular
-                        v-if="isProcessingNewComment"
-                        style="position: absolute; background-color: #555555; width: 100%"
-                        indeterminate
-                        color="primary"
-                    ></v-progress-circular>
-                </v-btn>
-
-                <v-btn
-                    v-else
-                    v-on:click="authenticate()"
-                    text
-                    style="position: relative; margin: 0.5rem 0 0 auto;"
-                >
-                    Login to comment
-                </v-btn>
-            </div>
-
-            <div id="comment-actions-container">
-                <v-select
-                    v-model="numComments"
-                    v-bind:style="{ justifyContent: justifyActionBox}"
-                    :items="numCommentOptions"
-                    :color="colors.textPrimary"
-                    label="Number of Comments"
-                    style="max-width: 100px; margin-top: 1rem;" 
-                    prepend-icon="filter_list"
-                    single-line
-                    v-on:change="changeNumComments()"
-                ></v-select>
-
-                <div id="pagination-container">
-                    <v-btn 
-                        icon
-                        v-on:click="changeCommentPage(false)"
-                    >
-                        <v-icon>mdi-chevron-left</v-icon>
-                    </v-btn>
-
-                    <span style="margin: 0 0.5rem;">{{page}}</span>
-
-                    <v-btn 
-                        icon
-                        v-on:click="changeCommentPage(true)"
-                    >
-                        <v-icon>mdi-chevron-right</v-icon>
-                    </v-btn>
-                </div>
-
-                 <v-btn 
-                    v-if="possibleAdmin"
-                    icon
-                    :color="colors.textPrimary"
-                    v-on:click="deleteComments()"
-                >
-                    <v-icon>mdi-close</v-icon>
-                </v-btn>
-            </div>                
-            
-            <div 
-                id="comment-list" 
-                v-if="firstLoadDone"
-            >
-                <Comment
-                    v-for="comment in commentList"
-                    :key="comment.id"
-                    :commentData="comment"
-                    :successfulChangeCallback="commentSuccessCallback"
-                />
-            </div>
-
-            <div 
-                v-if="!firstLoadDone"
-                id="skeleton-load-container"
-            >
-                <v-skeleton-loader
-                    v-for="i in numComments"
-                    :key="i"
-                    style="width: 100%; margin-bottom: 1rem;"
-                    color="#555555"
-                    type="list-item-three-line"
-                ></v-skeleton-loader>
-            </div>
-        </div>
+        <CommentList :alertDelegate="alertDelegate"/>        
 
     </div>
 </template>
 
 <script>
-import {COLORS, WEBSITE_URL} from '../utils/constants'
-import Comment from './sub-components/Comment'
+import CommentList from './sub-components/CommentList'
 
 export default {
     name: 'Connect',
-
-    async created () {
-
-        let respData = await this.getDataFromServer()
-        this.updateCommentList(respData)
-        this.firstLoadDone = true
-
-        let adminKey = getCookie("xcvd_admin_key_xcvi")
-        if (adminKey.length > 0) {
-            this.possibleAdmin = true;
-            this.adminKey = adminKey
-        }
-    },
-
-    async mounted () {
-        await this.checkAuth()
-    },
     
     data () {
         return {
-            name: "",
-            message: "",
-
-            isUserLoggedIn: false,
-            
-            page: 1,
-            lastPage: Number.MAX_SAFE_INTEGER,
-            numComments: 5,
-            commentList: [],
-            numCommentOptions: [5, 10, 15],
-
             alertMessage: "",
             alertType: "success",
             alert: false,
-            
-            firstLoadDone: false,
-            isProcessingNewComment: false,
-
-            possibleAdmin: false,
-            justifyActionBox: "flex-start",
-            colors: COLORS
         }
     },
 
     components: {
-        Comment
+        CommentList
     },
 
     methods: {
-
-        checkAuth: async function() {
-            let response = await fetch(WEBSITE_URL + '/checkAuth')            
-
-            if (response.ok){
-
-                let respObject = await response.json()         
-                this.isUserLoggedIn = respObject.isLoggedIn;
-
-                this.$root.$emit('authCheck', respObject)
-            }
-        },
-
-        authenticate: async function () {
-            let response = await fetch(WEBSITE_URL + '/authenticate')
-
-            if (response.ok) {
-                let respObject = await response.json()
-                location.href = respObject.authURL
-            } else {
-                alert("There was an issue processing your request, please try again later")
-            }                
-        },
-
-        getDataFromServer: async function () {        
-            
-            let response = await fetch(WEBSITE_URL + '/comments?numComments=' + this.numComments + "&page=" + this.page)
-            let respData;
-            
-            if (response.ok) {                
-                respData = await response.json()                 
-            } else {
-                alert("There appears to be a connection error, please try again later")
-                respData = []
-            }
-
-            this.isProcessingNewComment = false
-            return respData
-        },
-
-        updateCommentList: function (respData) {
-            
-            // Format timestamp to MM/DD/YYYY
-            for (let comment of respData){                    
-                let date = new Date(comment.timestamp)                    
-                comment.timestamp = (date.getMonth() + 1).toString() + "/" + (date.getDay()).toString() +  "/"  + (date.getFullYear()).toString()
-            }
-
-            this.commentList = respData
-        },
-
-        sendComment: async function() {
-            
-            this.isProcessingNewComment = true
-
-            const userName = this.name
-            const userMessage = this.message
-            let response = await fetch(WEBSITE_URL + '/comments', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    datePosted: null,
-                    name: userName,
-                    message: userMessage
-                })
-            })
-
-            if (response.ok) {
-                this.name = ""
-                this.message = ""
-            } else {
-                alert("There appears to be a connection error, please try again later")
-            }
-
-            this.isProcessingNewComment = false
-
-            // Call the get command to update the UI with the comment sent via the POST above
-            let respData = await this.getDataFromServer()
-            this.updateCommentList(respData)
-
-        },
-
-        deleteComments: async function () {
-            let response = await fetch(WEBSITE_URL + '/delete-data', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    adminKey: this.adminKey
-                })
-            })
-
-            if (response.ok) {
-                
-                this.alertType = "success"
-                this.alertMessage = "Comments delete successfully"
-
-                // Call the get command to update the UI with the comment sent via the POST above
-                let respData = await this.getDataFromServer()
-                this.updateCommentList(respData)
-            } else {
-                this.alertType = "error"
-                this.alertMessage = "You are not in the sudoers file, this incident will be reported"
-            }
-
-            this.alert = true
-        },
-
-        commentSuccessCallback: async function () {
-            let respData = await this.getDataFromServer()
-            console.log(respData)
-            this.updateCommentList(respData)
-        },
-
-        changeNumComments: async function() {
-
-            // Reset last page value since there will be a new number of comments per page
-            this.lastPage = Number.MAX_SAFE_INTEGER            
-
-            let respData = await this.getDataFromServer()
-
-            if (respData.length < 1){
-                // Set the last page as the current page, as there are no comments in the current page
-                this.lastPage = this.page - 1
-
-                // If the current page is not 1, then show user the previous page. If it is 1 it means there are no comments at all, so do nothing
-                this.page != 1 && (this.page -= 1)
-
-                let respData = await this.getDataFromServer()
-                
-                this.updateCommentList(respData)
-                
-                return
-            }
-
-            this.updateCommentList(respData)
-        },
-
-        changeCommentPage: async function (isForward) {
-            if (isForward) {
-                if (this.page < this.lastPage){this.page += 1}                
-            }
-
-            else {
-                if (this.page > 1){ this.page -= 1 }                
-            }
-            
-            // Get data for new comments page
-            let respData = await this.getDataFromServer()
-
-            if (respData.length < 1){
-
-                // Set the last page as the current page, as there are no comments in the current page
-                this.lastPage = this.page - 1
-
-                // If the current page is not 1, then show user the previous page. If it is 1 it means there are no comments at all, so do nothing
-                this.page != 1 && (this.page -= 1)
-                
-                return
-            } 
-            
-            else { 
-                this.updateCommentList(respData)
-            }
-        }
-
-    }
-}
-
-
-// Cookie reading function from https://www.w3schools.com/js/js_cookies.asp 
-function getCookie(cname) {
-    var name = cname + "="
-    var decodedCookie = document.cookie
-    var ca = decodedCookie.split(';')
-    for(var i = 0; i <ca.length; i++) {
-        var c = ca[i]
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1)
-        }
-
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length)
+        alertDelegate: function (isVisibile, type, message) {
+            this.alert = isVisibile
+            this.alertType = type
+            this.alertMessage = message
         }
     }
-    return ""
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
     #connect-container {
-        height: 100%;
-        width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-
         padding: 80px 16px 25px 16px;
-
-        background-color: #292929;
     }
 
     #connect-alert {
@@ -418,86 +88,7 @@ function getCookie(cname) {
 
     .media-box {
         height: auto;
-        width: 90%
-    }
-
-    #skeleton-load-container {
-        width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-    }
-
-    #comments-container {
-        width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-    }
-
-    #message-input-container {
-        box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12), 0 2px 4px -1px rgba(0,0,0,0.20);
-    }
-
-    #comment-actions-container {
-        width: 100%;
-        
-        display: flex;
-        flex-direction: row;
-        align-items: center;        
-        justify-content: space-between;
-    }
-
-    #comment-list {
-        height: 100%;
-        width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;        
-    }
-
-    .comment-header-container {
-        width: 100%;
-        height: auto;
-        
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        margin-bottom: 0.5rem;
-    }
-
-    .comment {
-        height: fit-content;
-        width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;        
-
-        margin-top: 1rem;
-        padding: 16px;
-
-        border-radius: 2px;
-        background-color: #555555;
-    }
-
-
-    #pagination-container {
-        display: flex;
-        width: 100%;
-
-        align-items: center;
-        justify-content: center;
-
-        margin-top: 1rem;
+        width: 90%;
     }
 
     /* Have to override this to get the right background color */
@@ -506,9 +97,6 @@ function getCookie(cname) {
     }
 
     @media screen and (min-width: 750px){
-        #connect-container {
-            padding: 80px 20% 0px 20%;
-        }
 
         #social-media-container {
             width: 50%;
