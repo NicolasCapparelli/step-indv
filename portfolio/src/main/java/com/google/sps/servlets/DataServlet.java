@@ -47,6 +47,9 @@ import com.google.sps.data.Comment;
 @WebServlet("/comments")
 public class DataServlet extends HttpServlet {
 
+    private final int defaultNumComments = 5;
+    private final int defaultPage = 1;
+
     @Override // Retrieves x comments
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -57,12 +60,14 @@ public class DataServlet extends HttpServlet {
             numComments = Integer.parseInt(request.getParameter("numComments"));
             page = Integer.parseInt(request.getParameter("page"));
         } catch (NumberFormatException e) {
-            numComments = 5;
-            page = 1;
+            System.out.println(e);
+            
+            numComments = defaultNumComments;
+            page = defaultPage;
         }
                 
         // Retrieving Comments from DataStore
-        Query query = new Query("Comment").addSort("timestamp", SortDirection.ASCENDING);
+        Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
         PreparedQuery results = datastore.prepare(query);
 

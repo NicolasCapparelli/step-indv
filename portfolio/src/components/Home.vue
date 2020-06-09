@@ -1,5 +1,5 @@
 <template>
-    <div id="home-container">
+    <div class="page-container" id="home-container">
         <div id="landing-text">
             <h1>Hi. I'm Nico.</h1>
             <p>I'm a Computer Science student with a deep passion for software engineering. Checkout some of my work below and feel free to get in touch</p>
@@ -61,6 +61,8 @@ export default {
     },
     data () {
         return {
+
+            isUserLoggedIn: false,
             navSquareList: [
                 {
                     title: "Resume",
@@ -89,18 +91,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-    #home-container {
-        height: 100%;
-        width: 100%;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-
-        padding: 100px 16px 16px 16px;
-
-        background-color: transparent;
+    #home-container {        
+        
     }
 
     #landing-text {
@@ -132,7 +124,7 @@ export default {
 
     @media screen and (min-width: 1200px){
         #home-container {
-            padding: 100px 20% 5% 20%;
+            padding: 100px 0 0 0;
         }
 
         #landing-text {        
@@ -148,8 +140,8 @@ export default {
         }
 
         #navigation-square-container {
-            height: 100%;
-            width: 60%;
+            height: 70%;
+            width: 100%;
             grid-template-columns: auto auto;
         }
 

@@ -48,4 +48,27 @@ export default {
         width: 100vw;
         overflow: hidden;
     }
+
+    .page-container {
+        height: 100%;
+        width: 100%;
+        max-width: 900px;
+        margin: auto;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+
+        padding: 100px 16px 16px 16px;
+
+        background-color: #292929;
+    }
+
+    @media screen and (min-width: 1200px){
+        .page-container {
+            padding: 100px 0 0 0;
+        }
+    }
+
 </style>
