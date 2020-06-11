@@ -1,55 +1,50 @@
 <template>
-    <div id="web-resume-component-container">
-        <Education/>        
-        
-        <v-divider></v-divider>    
-        
-        <Experience/>
-        
-        <v-divider></v-divider>
-        
-        <Projects/>
+  <div id="web-resume-component-container">
+    <Education/>    
+    
+    <v-divider></v-divider>  
+    
+    <Experience/>
+    
+    <v-divider></v-divider>
+    
+    <Projects/>
 
-        <v-divider></v-divider>        
+    <v-divider></v-divider>    
 
-        <Skills/>
+    <Skills/>
 
-        <v-divider></v-divider>
+    <v-divider></v-divider>
 
-        <Awards/>
+    <Awards/>
 
-    </div>
+  </div>
 </template>
 
 <script>
-import Education from './Education'
-import Experience from './Experience'
-import Projects from './Projects'
-import Skills from './Skills'
-import Awards from './Awards'
+import Education from './Education.vue'
+import Experience from './Experience.vue'
+import Projects from './Projects.vue'
+import Skills from './Skills.vue'
+import Awards from './Awards.vue'
 
 export default {
   name: 'Template',
-  props: {
-    msg: String
-  },
   components: {
-      Education,
-      Experience,
-      Skills,
-      Projects,
-      Awards
+    Education,
+    Experience,
+    Skills,
+    Projects,
+    Awards
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
-    #web-resume-component-container {
-        width: 100%;
-        height: 100%;
-        padding: 10px 16px;
-    }    
+  #web-resume-component-container {
+    width: 100%;
+    height: 100%;
+    padding: 10px 16px;
+  }  
 
 </style>
