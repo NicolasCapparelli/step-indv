@@ -14,9 +14,9 @@
           class="vote-button"
           v-on:click="commentRatingChange(true)"
         >
-          <v-icon>mdi-thumb-up</v-icon>
+          <v-icon :color="upvoteSelected ? colors.selected : colors.unSelected">mdi-thumb-up</v-icon>
         </v-btn>
-        <span>{{commentData.upvotes}}</span>   
+        <span>{{upvotes}}</span>
       </div>
 
       <div>
@@ -26,9 +26,9 @@
             class="vote-button"
             v-on:click="commentRatingChange(false)"
         >
-          <v-icon>mdi-thumb-down</v-icon>
+          <v-icon :color="downvoteSelected ? colors.selected : colors.unSelected">mdi-thumb-down</v-icon>
         </v-btn>
-        <span>{{commentData.downvotes}}</span>
+        <span>{{downvotes}}</span>
       </div>
     </div>
 
@@ -36,16 +36,34 @@
 </template>
 
 <script>
-import {WEBSITE_URL} from '../../utils/constants.js';
+import {WEBSITE_URL, COLORS} from '../../utils/constants.js';
 
 export default {
-  name: 'Comment',
+  name: 'Comment',  
+  mounted (){    
+    this.updateRatings();
+  },
+  
   props: {
     commentData: Object,
-    successfulChangeCallback: Function
+    successfulChangeCallback: Function,
   },
+
+  data() {
+    return {
+      upvotes: 0,
+      downvotes: 0,
+      
+      upvoteSelected: false,
+      downvoteSelected: false,
+
+      colors: COLORS
+    }
+  }, 
+
   methods: {
     commentRatingChange: async function(isUpvote) {  
+
       let response = await fetch(WEBSITE_URL + '/rating', {
         method: "POST",
         headers: {
@@ -53,18 +71,70 @@ export default {
         },
         body: JSON.stringify({
           commentID: this.commentData.id,
-          isUpvote: isUpvote
-
+          vote: isUpvote ? 1 : -1
         })
       });
 
       if (response.ok) {
-        this.successfulChangeCallback();
+        await this.successfulChangeCallback();
+        this.updateRatings();    
       } else {
-        alert("There was an error processing your request, please try again later");
+        alert("You must be logged in to rate comments");
+      }
+    },
+
+    updateRatings: function() {
+      this.countVotes();
+      this.updateSelected();
+    },
+
+    countVotes: function () {    
+      let upvotes = 0;
+      let downvotes = 0;
+      if (this.commentData.voteMap) {
+        let voterMap = this.commentData.voteMap.propertyMap;
+        for (let voter in voterMap){
+          if (voterMap[voter] == 1) {
+            upvotes++;
+          } else {
+            downvotes++;
+          }
+        }
+
+        // Everytime a state attribute is changed, the view is rendered again, which is why I don't 
+        // increment this.upvotes and this.downvotes in the loop
+        this.upvotes = upvotes;
+        this.downvotes = downvotes;
+      }
+    },
+
+    updateSelected: function () {
+      let voteMap;
+      
+      // If voteMap == null there are no ratings
+      if (this.commentData.voteMap) {
+        voteMap = this.commentData.voteMap.propertyMap;
+      } else {
+        return;
+      }
+      
+      
+      const userID = this.commentData.userID;
+      if (userID in voteMap) {      
+        if (voteMap[userID] == 1) { 
+          this.upvoteSelected = true;
+          this.downvoteSelected = false;
+        } else {
+          this.upvoteSelected = false;       
+          this.downvoteSelected = true;
+        }      
+      } else {
+          this.upvoteSelected = false; 
+          this.downvoteSelected = false;
       }
     }
-  }
+    
+  },
 }
 </script>
 

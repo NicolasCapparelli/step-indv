@@ -7,6 +7,7 @@
         v-model="name"
         :color="colors.textPrimary"
         dark
+        :disabled="!isUserLoggedIn"
       ></v-text-field>
       <v-textarea
         v-model="message"
@@ -14,6 +15,7 @@
         style="width: 100%;"
         :color="colors.textPrimary"
         dark
+        :disabled="!isUserLoggedIn"
       ></v-textarea>
       <v-btn
         v-if="isUserLoggedIn"
@@ -349,6 +351,7 @@ export default {
     commentSuccessCallback: async function () {
       let respData = await this.getComments(this.numComments, this.page);
       this.updateCommentList(respData);
+      this.$forceUpdate();
     },
 
   }

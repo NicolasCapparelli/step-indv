@@ -28,13 +28,15 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+
 
 import static java.lang.Math.toIntExact;
 import static java.lang.Math.min;
 
-import java.util.List; 
+import java.util.List;
 import java.util.Date;
 import java.text.DateFormat;  
 import java.text.SimpleDateFormat;  
@@ -86,13 +88,12 @@ public class DataServlet extends HttpServlet {
             String message = (String) entity.getProperty("message");
             long timestamp = (long) entity.getProperty("timestamp"); 
             
-            int upvotes = toIntExact((long) entity.getProperty("upvotes"));
-            int downvotes = toIntExact((long) entity.getProperty("downvotes"));
-            
+            EmbeddedEntity voteMap = (EmbeddedEntity) entity.getProperty("voteMap");
+            String userID = (String) entity.getProperty("userID");
             long id = entity.getKey().getId();
 
-            Comment newComment = new Comment(name, message, timestamp, upvotes, downvotes, id);
-            commentList.add(newComment);        
+            Comment newComment = new Comment(name, message, timestamp, voteMap, userID, id);
+            commentList.add(newComment);
         }
     
 
@@ -108,16 +109,18 @@ public class DataServlet extends HttpServlet {
         UserService userService = UserServiceFactory.getUserService();
         
         if (userService.isUserLoggedIn()) {
-            createCommnet(request);
+            createCommnet(request, userService);
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
         
     }
 
-    private void createCommnet(HttpServletRequest request) throws IOException {
+    private void createCommnet(HttpServletRequest request, UserService userService) throws IOException {
+
         // To be used for timestamp
         long timestamp = System.currentTimeMillis();
+        String userID = userService.getCurrentUser().getUserId();
 
         // Create JSON object with GSON
         String requestData = request.getReader().lines().collect(Collectors.joining());
@@ -127,11 +130,13 @@ public class DataServlet extends HttpServlet {
         Entity taskEntity = new Entity("Comment");
         taskEntity.setProperty("name", comment.getName());
         taskEntity.setProperty("message", comment.getMessage());
+        taskEntity.setProperty("userID", userID);
         taskEntity.setProperty("timestamp", timestamp);
 
-        int defaultRating = 0;
-        taskEntity.setProperty("upvotes", defaultRating);
-        taskEntity.setProperty("downvotes", defaultRating);
+        EmbeddedEntity voteMap = new EmbeddedEntity();
+        voteMap.setProperty(userID, 1);
+        
+        taskEntity.setProperty("voteMap", voteMap);
 
         // Placing Entity in datastore for persistant storage
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
