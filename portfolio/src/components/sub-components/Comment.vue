@@ -14,7 +14,7 @@
           class="vote-button"
           v-on:click="commentRatingChange(true)"
         >
-          <v-icon :color="upvoteSelected ? '#4ca6ff' : '#ffffff'">mdi-thumb-up</v-icon>
+          <v-icon :color="upvoteSelected ? colors.selected : colors.unSelected">mdi-thumb-up</v-icon>
         </v-btn>
         <span>{{upvotes}}</span>
       </div>
@@ -26,7 +26,7 @@
             class="vote-button"
             v-on:click="commentRatingChange(false)"
         >
-          <v-icon :color="downvoteSelected ? '#4ca6ff' : '#ffffff'">mdi-thumb-down</v-icon>
+          <v-icon :color="downvoteSelected ? colors.selected : colors.unSelected">mdi-thumb-down</v-icon>
         </v-btn>
         <span>{{downvotes}}</span>
       </div>
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import {WEBSITE_URL} from '../../utils/constants.js';
+import {WEBSITE_URL, COLORS} from '../../utils/constants.js';
 
 export default {
   name: 'Comment',  
@@ -56,6 +56,8 @@ export default {
       
       upvoteSelected: false,
       downvoteSelected: false,
+
+      colors: COLORS
     }
   }, 
 
