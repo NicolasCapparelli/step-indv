@@ -77,7 +77,7 @@ export default {
         await this.successfulChangeCallback();
         this.updateRatings();    
       } else {
-        alert("There was an error processing your request, please try again later");
+        alert("You must be logged in to rate comments");
       }
     },
 
@@ -107,7 +107,15 @@ export default {
     },
 
     updateSelected: function () {
-      const voteMap = this.commentData.voteMap.propertyMap      
+      let voteMap;
+      
+      // If voteMap == null there are no ratings
+      if (this.commentData.voteMap) {
+        voteMap = this.commentData.voteMap.propertyMap;
+      } else {
+        return;
+      }
+      
       
       const userID = this.commentData.userID;
       if (userID in voteMap) {      
