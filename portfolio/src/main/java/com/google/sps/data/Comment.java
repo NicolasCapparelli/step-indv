@@ -1,19 +1,21 @@
 package com.google.sps.data;
+import java.util.List;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 
 public final class Comment {
   String name;
-  String message;
-  int upvotes;
-  int downvotes;
+  String message;  
   long timestamp;
+  EmbeddedEntity voteMap;
+  String userID;  
   long id;
 
-  public Comment(String name, String message,  long timestamp, int upvotes, int downvotes, long id) {
+  public Comment(String name, String message, long timestamp, EmbeddedEntity voteMap, String userID, long id) {
     this.name = name;
     this.message = message;    
     this.timestamp = timestamp;
-    this.upvotes = upvotes;
-    this.downvotes = downvotes;
+    this.voteMap = voteMap;
+    this.userID = userID;
     this.id = id;
   }
 

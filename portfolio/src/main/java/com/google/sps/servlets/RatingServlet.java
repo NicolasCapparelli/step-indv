@@ -30,6 +30,9 @@ import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.EmbeddedEntity;
+
+
 import static java.lang.Math.toIntExact;
 
 import java.util.List; 
@@ -41,6 +44,9 @@ import java.util.ArrayList;
 import java.util.stream.Collectors; 
 import com.google.sps.data.RatingData;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
 /** Endpoint for updating comment ratings'*/
 @WebServlet("/rating")
 public class RatingServlet extends HttpServlet {
@@ -48,6 +54,21 @@ public class RatingServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         
+        UserService userService = UserServiceFactory.getUserService();
+        
+        if (userService.isUserLoggedIn()) {
+            updateComment(request, response, userService);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+
+        String userID = userService.getCurrentUser().getUserId();
+                
+    }
+
+    private void updateComment(HttpServletRequest request, HttpServletResponse response, UserService userService) throws IOException {
+
+        String userID = userService.getCurrentUser().getUserId();
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
         // Create JSON object with GSON
@@ -66,16 +87,22 @@ public class RatingServlet extends HttpServlet {
             return;
         }
         
-        
-        if (ratingData.isUpvote()) {
-            int upvotes = toIntExact((long) comment.getProperty("upvotes"));
-            comment.setProperty("upvotes", ++upvotes);
+        EmbeddedEntity voteMap = (EmbeddedEntity) comment.getProperty("voteMap");        
+        if (voteMap.hasProperty(userID)) {
+            
+            int oldVote = toIntExact((long) voteMap.getProperty(userID));
+
+            // If the new vote is the same as the old one, remove user from voter list, thus no vote
+            if (oldVote == ratingData.getVote()) {
+                voteMap.removeProperty(userID);
+            } else {
+                voteMap.setProperty(userID, ratingData.getVote());
+            }
         } else {
-            int downvotes = toIntExact((long) comment.getProperty("downvotes"));
-            comment.setProperty("downvotes", ++downvotes);
+            voteMap.setProperty(userID, ratingData.getVote());
         }
         
-        datastore.put(comment);        
+        datastore.put(comment);
     }
 
 }

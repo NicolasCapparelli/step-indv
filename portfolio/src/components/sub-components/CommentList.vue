@@ -349,6 +349,7 @@ export default {
     commentSuccessCallback: async function () {
       let respData = await this.getComments(this.numComments, this.page);
       this.updateCommentList(respData);
+      this.$forceUpdate();
     },
 
   }
