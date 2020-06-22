@@ -102,6 +102,7 @@
       <Comment
         v-for="comment in commentList"
         :key="comment.id"
+        :loggedInUserId="userId"
         :commentData="comment"
         :successfulChangeCallback="commentSuccessCallback"
       />
@@ -138,6 +139,7 @@ export default {
 
   async created () {
 
+    await this.checkAuth();
     let respData = await this.getComments(this.numComments, this.page);
     this.updateCommentList(respData);
     this.firstLoadDone = true;
@@ -150,7 +152,9 @@ export default {
   },
 
   async mounted () {
-    await this.checkAuth();
+    if (!this.isUserLoggedIn) {
+      await this.checkAuth();
+    }
   },
 
   data () {
@@ -159,7 +163,8 @@ export default {
       message: "",
 
       commentList: [],
-
+      
+      userId: "dafault",
       isUserLoggedIn: false,
       isProcessingNewComment: false,
       isCheckingAuth: false,
@@ -188,6 +193,7 @@ export default {
 
         let respObject = await response.json();
         this.isUserLoggedIn = respObject.isLoggedIn;
+        this.userId = respObject.userId;
 
         this.$root.$emit('authCheck', respObject);
       }
@@ -465,7 +471,7 @@ function getCookie(cname) {
     width: 100%;
 
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
 
     margin-top: 1rem;
   }

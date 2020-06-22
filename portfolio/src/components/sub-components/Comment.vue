@@ -45,6 +45,7 @@ export default {
   },
   
   props: {
+    loggedInUserId: String,
     commentData: Object,
     successfulChangeCallback: Function,
   },
@@ -117,11 +118,15 @@ export default {
       } else {
         return;
       }
-      
-      
-      const userID = this.commentData.userID;
-      if (userID in voteMap) {      
-        if (voteMap[userID] == 1) { 
+
+      console.log("----");
+      console.log(this.loggedInUserId);
+      console.log(voteMap);
+      console.log("----");
+
+
+      if (this.loggedInUserId.length > 1 && this.loggedInUserId in voteMap) {
+        if (voteMap[this.loggedInUserId] == 1) {
           this.upvoteSelected = true;
           this.downvoteSelected = false;
         } else {

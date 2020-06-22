@@ -32,22 +32,26 @@ public class CheckAuthServlet extends HttpServlet {
         UserService userService = UserServiceFactory.getUserService();
         if (userService.isUserLoggedIn()) {        
             String userEmail = userService.getCurrentUser().getEmail();
-            json = createJSON(true, userEmail);
+            String userId = userService.getCurrentUser().getUserId();
+            json = createJSON(true, userEmail, userId);
         } else {
-            json = createJSON(false, "");
+            json = createJSON(false, "", "");
         }
 
         response.setContentType("application/json;");
         response.getWriter().println(json);
     }
 
-    private String createJSON(boolean  isLoggedIn, String userEmail){
+    private String createJSON(boolean  isLoggedIn, String userEmail, String userId){
         String json = "{";
             json += "\"isLoggedIn\": ";
             json += isLoggedIn;
             json += ",";
             json += "\"email\": ";
             json += "\"" + userEmail + "\"";
+            json += ",";
+            json += "\"userId\": ";
+            json += "\"" + userId + "\"";
             json += "}";
         return json;
     }    
